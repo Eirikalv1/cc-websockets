@@ -1,6 +1,4 @@
 use macroquad::prelude::*;
-use macroquad::hash;
-use macroquad::ui::root_ui;
 
 struct VoxelCamera {
     move_speed: f32,
@@ -42,7 +40,7 @@ impl VoxelCamera {
             self.yaw += mouse_delta.x * delta * self.look_speed;
             self.pitch += mouse_delta.y * delta * -self.look_speed;
         }
-        
+
         self.pitch = if self.pitch > 1.5 { 1.5 } else { self.pitch };
         self.pitch = if self.pitch < -1.5 { -1.5 } else { self.pitch };
 
@@ -73,7 +71,7 @@ impl VoxelCamera {
         if is_key_down(KeyCode::Q) && !self.locked {
             self.position.y -= self.move_speed;
         }
-        
+
         set_camera(&Camera3D {
             position: self.position,
             up: Vec3::Y,
@@ -83,11 +81,32 @@ impl VoxelCamera {
     }
 }
 
-pub async fn run() {
-    let mut text = String::new();
+struct TextInput {
+    text: String,
+}
 
+impl TextInput {
+    fn new() -> Self {
+        TextInput {
+            text: String::new(),
+        }
+    }
+
+    fn process(&mut self) {
+        use macroquad::hash;
+        use macroquad::ui::root_ui;
+
+        root_ui().window(hash!(), vec2(700., 0.), vec2(300., 50.), |ui| {
+            ui.input_text(macroquad::hash!(), "Text", &mut self.text);
+        });
+        root_ui().pop_skin();
+    }
+}
+
+pub async fn run() {
     let mut camera = VoxelCamera::new();
-    
+    let mut text_input = TextInput::new();
+
     let mut grabbed = true;
     set_cursor_grab(grabbed);
     show_mouse(false);
@@ -96,6 +115,10 @@ pub async fn run() {
         clear_background(LIGHTGRAY);
 
         camera.process();
+
+        if camera.locked {
+            text_input.process();
+        }
 
         if is_key_pressed(KeyCode::Escape) {
             break;
@@ -107,6 +130,10 @@ pub async fn run() {
             show_mouse(!grabbed);
         }
 
+        if is_key_pressed(KeyCode::Enter) && camera.locked {
+            text_input.text = String::new();
+        }
+
         draw_grid(20, 1., BLACK, GRAY);
 
         draw_cube_wires(vec3(0., 1., -6.), vec3(2., 2., 2.), GREEN);
@@ -115,11 +142,6 @@ pub async fn run() {
 
         set_default_camera();
         draw_text("First Person Camera", 10.0, 20.0, 30.0, BLACK);
-
-        root_ui().window(hash!(), vec2(700., 0.), vec2(300., 50.), |ui| {
-            ui.input_text(hash!(), "Text", &mut text);
-            });
-        root_ui().pop_skin();
 
         next_frame().await
     }
