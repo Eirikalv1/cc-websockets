@@ -6,4 +6,3 @@ use bevy::prelude::*;
 fn main() {
     gui_client::run();
 }
-

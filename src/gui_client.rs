@@ -1,6 +1,6 @@
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use bevy_flycam::prelude::PlayerPlugin;
-use bevy_egui::{EguiPlugin, EguiContexts, egui};
 
 pub fn run() {
     App::new()
@@ -14,7 +14,6 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
         material: materials.add(Color::rgb_u8(124, 144, 255).into()),
@@ -31,7 +30,6 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
-
 }
 
 fn input(mut contexts: EguiContexts) {
