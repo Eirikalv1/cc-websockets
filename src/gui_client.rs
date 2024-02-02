@@ -1,7 +1,6 @@
 use macroquad::prelude::*;
 
 struct VoxelCamera {
-    grabbed: bool,
     move_speed: f32,
     last_mouse_position: Vec2,
     look_speed: f32,
@@ -18,12 +17,7 @@ impl VoxelCamera {
         let position = vec3(0.0, 1.0, 0.0);
         let last_mouse_position: Vec2 = mouse_position().into();
 
-        let grabbed = true;
-        set_cursor_grab(grabbed);
-        show_mouse(false);
-
         VoxelCamera {
-            grabbed,
             move_speed: 0.1,
             last_mouse_position,
             look_speed: 0.1,
@@ -35,12 +29,6 @@ impl VoxelCamera {
 
     fn process(&mut self) {
         let delta = get_frame_time();
-
-        if is_key_pressed(KeyCode::Tab) {
-            self.grabbed = !self.grabbed;
-            set_cursor_grab(self.grabbed);
-            show_mouse(!self.grabbed);
-        }
 
         let mouse_position: Vec2 = mouse_position().into();
         let mouse_delta = mouse_position - self.last_mouse_position;
@@ -88,6 +76,26 @@ impl VoxelCamera {
             target: self.position + front,
             ..Default::default()
         });
+    }
+}
+
+pub async fn run() {
+    let mut voxel_camera = VoxelCamera::new();
+    loop {
+        voxel_camera.process();
+
+        let mut grabbed = true;
+        set_cursor_grab(grabbed);
+        show_mouse(false);
+
+        if is_key_pressed(KeyCode::Escape) {
+            break;
+        }
+        if is_key_pressed(KeyCode::Tab) {
+            grabbed = !grabbed;
+            set_cursor_grab(grabbed);
+            show_mouse(!grabbed);
+        }
 
         draw_grid(20, 1., BLACK, GRAY);
 
@@ -97,32 +105,6 @@ impl VoxelCamera {
 
         set_default_camera();
         draw_text("First Person Camera", 10.0, 20.0, 30.0, BLACK);
-
-        draw_text(
-            format!("X: {} Y: {}", mouse_position.x, mouse_position.y).as_str(),
-            10.0,
-            48.0 + 18.0,
-            30.0,
-            BLACK,
-        );
-        draw_text(
-            format!("Press <TAB> to toggle mouse grab: {}", self.grabbed).as_str(),
-            10.0,
-            48.0 + 42.0,
-            30.0,
-            BLACK,
-        );
-    }
-}
-
-pub async fn run() {
-    let mut voxel_camera = VoxelCamera::new();
-    loop {
-        voxel_camera.process();
-
-        if is_key_pressed(KeyCode::Escape) {
-            break;
-        }
 
         next_frame().await
     }
