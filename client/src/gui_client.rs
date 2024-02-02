@@ -1,9 +1,10 @@
 use macroquad::prelude::*;
 
-struct VoxelCamera {
+#[derive(Default)]
+pub struct VoxelCamera {
     move_speed: f32,
     last_mouse_position: Vec2,
-    locked: bool,
+    pub locked: bool,
     look_speed: f32,
     pitch: f32,
     position: Vec3,
@@ -11,7 +12,7 @@ struct VoxelCamera {
 }
 
 impl VoxelCamera {
-    fn new() -> Self {
+    pub fn new() -> Self {
         let yaw: f32 = 1.18;
         let pitch: f32 = 0.0;
 
@@ -29,7 +30,7 @@ impl VoxelCamera {
         }
     }
 
-    fn process(&mut self) {
+    pub fn process(&mut self) {
         let delta = get_frame_time();
 
         let mouse_position: Vec2 = mouse_position().into();
@@ -81,18 +82,19 @@ impl VoxelCamera {
     }
 }
 
-struct TextInput {
-    text: String,
+#[derive(Default)]
+pub struct TextInput {
+    pub text: String,
 }
 
 impl TextInput {
-    fn new() -> Self {
+    pub fn new() -> Self {
         TextInput {
             text: String::new(),
         }
     }
 
-    fn process(&mut self) {
+    pub fn process(&mut self) {
         use macroquad::hash;
         use macroquad::ui::root_ui;
 
@@ -100,49 +102,5 @@ impl TextInput {
             ui.input_text(macroquad::hash!(), "Text", &mut self.text);
         });
         root_ui().pop_skin();
-    }
-}
-
-pub async fn run() {
-    let mut camera = VoxelCamera::new();
-    let mut text_input = TextInput::new();
-
-    let mut grabbed = true;
-    set_cursor_grab(grabbed);
-    show_mouse(false);
-
-    loop {
-        clear_background(LIGHTGRAY);
-
-        camera.process();
-
-        if camera.locked {
-            text_input.process();
-        }
-
-        if is_key_pressed(KeyCode::Escape) {
-            break;
-        }
-        if is_key_pressed(KeyCode::Tab) {
-            grabbed = !grabbed;
-            camera.locked = !camera.locked;
-            set_cursor_grab(grabbed);
-            show_mouse(!grabbed);
-        }
-
-        if is_key_pressed(KeyCode::Enter) && camera.locked {
-            text_input.text = String::new();
-        }
-
-        draw_grid(20, 1., BLACK, GRAY);
-
-        draw_cube_wires(vec3(0., 1., -6.), vec3(2., 2., 2.), GREEN);
-        draw_cube_wires(vec3(0., 1., 6.), vec3(2., 2., 2.), BLUE);
-        draw_cube_wires(vec3(2., 1., 2.), vec3(2., 2., 2.), RED);
-
-        set_default_camera();
-        draw_text("First Person Camera", 10.0, 20.0, 30.0, BLACK);
-
-        next_frame().await
     }
 }

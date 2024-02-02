@@ -1,4 +1,5 @@
-mod gui_client;
+mod event_loop;
+pub mod gui_client;
 
 use macroquad::prelude::Conf;
 
@@ -14,5 +15,5 @@ fn conf() -> Conf {
 
 #[macroquad::main(conf)]
 async fn main() {
-    gui_client::run().await;
+    event_loop::run().await;
 }
