@@ -1,5 +1,5 @@
 [package]
-name = "websock"
+name = "cc-websockets"
 version = "0.1.0"
 edition = "2021"
 
