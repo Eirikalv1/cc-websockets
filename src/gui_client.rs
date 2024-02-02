@@ -1,8 +1,11 @@
 use macroquad::prelude::*;
+use macroquad::hash;
+use macroquad::ui::root_ui;
 
 struct VoxelCamera {
     move_speed: f32,
     last_mouse_position: Vec2,
+    locked: bool,
     look_speed: f32,
     pitch: f32,
     position: Vec3,
@@ -20,6 +23,7 @@ impl VoxelCamera {
         VoxelCamera {
             move_speed: 0.1,
             last_mouse_position,
+            locked: false,
             look_speed: 0.1,
             pitch,
             position,
@@ -34,9 +38,11 @@ impl VoxelCamera {
         let mouse_delta = mouse_position - self.last_mouse_position;
         self.last_mouse_position = mouse_position;
 
-        self.yaw += mouse_delta.x * delta * self.look_speed;
-        self.pitch += mouse_delta.y * delta * -self.look_speed;
-
+        if !self.locked {
+            self.yaw += mouse_delta.x * delta * self.look_speed;
+            self.pitch += mouse_delta.y * delta * -self.look_speed;
+        }
+        
         self.pitch = if self.pitch > 1.5 { 1.5 } else { self.pitch };
         self.pitch = if self.pitch < -1.5 { -1.5 } else { self.pitch };
 
@@ -49,27 +55,25 @@ impl VoxelCamera {
 
         let right = front.cross(Vec3::Y).normalize();
 
-        if is_key_down(KeyCode::W) {
+        if is_key_down(KeyCode::W) && !self.locked {
             self.position += front * self.move_speed;
         }
-        if is_key_down(KeyCode::S) {
+        if is_key_down(KeyCode::S) && !self.locked {
             self.position -= front * self.move_speed;
         }
-        if is_key_down(KeyCode::A) {
+        if is_key_down(KeyCode::A) && !self.locked {
             self.position -= right * self.move_speed;
         }
-        if is_key_down(KeyCode::D) {
+        if is_key_down(KeyCode::D) && !self.locked {
             self.position += right * self.move_speed;
         }
-        if is_key_down(KeyCode::E) {
+        if is_key_down(KeyCode::E) && !self.locked {
             self.position.y += self.move_speed;
         }
-        if is_key_down(KeyCode::Q) {
+        if is_key_down(KeyCode::Q) && !self.locked {
             self.position.y -= self.move_speed;
         }
-
-        clear_background(LIGHTGRAY);
-
+        
         set_camera(&Camera3D {
             position: self.position,
             up: Vec3::Y,
@@ -80,19 +84,25 @@ impl VoxelCamera {
 }
 
 pub async fn run() {
-    let mut voxel_camera = VoxelCamera::new();
-    loop {
-        voxel_camera.process();
+    let mut text = String::new();
 
-        let mut grabbed = true;
-        set_cursor_grab(grabbed);
-        show_mouse(false);
+    let mut camera = VoxelCamera::new();
+    
+    let mut grabbed = true;
+    set_cursor_grab(grabbed);
+    show_mouse(false);
+
+    loop {
+        clear_background(LIGHTGRAY);
+
+        camera.process();
 
         if is_key_pressed(KeyCode::Escape) {
             break;
         }
         if is_key_pressed(KeyCode::Tab) {
             grabbed = !grabbed;
+            camera.locked = !camera.locked;
             set_cursor_grab(grabbed);
             show_mouse(!grabbed);
         }
@@ -105,6 +115,11 @@ pub async fn run() {
 
         set_default_camera();
         draw_text("First Person Camera", 10.0, 20.0, 30.0, BLACK);
+
+        root_ui().window(hash!(), vec2(700., 0.), vec2(300., 50.), |ui| {
+            ui.input_text(hash!(), "Text", &mut text);
+            });
+        root_ui().pop_skin();
 
         next_frame().await
     }
