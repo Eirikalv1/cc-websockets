@@ -6,8 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.12.1"
-bevy_egui = "0.24.0"
-bevy_flycam = "0.12.0"
+macroquad = "0.4.4"
 simple-websockets = "0.1.6"
 tokio = { version = "1.35.1", features = ["full"] }
