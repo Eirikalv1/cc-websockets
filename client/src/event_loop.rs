@@ -18,12 +18,12 @@ pub async fn run() {
         if let Some(event) = event_hub.next_event() {
             match event {
                 Event::Connect(_, responder) => {
-                    println!("Client connected.");
+                    log::info!("Turtle connected.");
 
                     client = Some(responder);
                 }
                 Event::Disconnect(_) => {
-                    println!("Client disconnected.");
+                    log::info!("Turtle disconnected.");
 
                     client = None;
                 }

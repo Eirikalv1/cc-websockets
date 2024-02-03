@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+log = "0.4.20"
 macroquad = "0.4.4"
+pretty_env_logger = "0.5.0"
 simple-websockets = "0.1.6"
-tokio = { version = "1.35.1", features = ["full"] }
+
