@@ -15,5 +15,8 @@ fn conf() -> Conf {
 
 #[macroquad::main(conf)]
 async fn main() {
+    std::env::set_var("RUST_LOG", "info");
+    pretty_env_logger::init();
+
     event_loop::run().await;
 }
