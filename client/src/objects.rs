@@ -1,5 +1,7 @@
 use macroquad::prelude::*;
 
+use crate::SCAN_WIDTH;
+
 #[derive(Default)]
 pub struct VoxelCamera {
     move_speed: f32,
@@ -80,6 +82,11 @@ impl VoxelCamera {
             ..Default::default()
         });
     }
+
+    // Call this after all draw calls
+    pub fn set_default_camera() {
+        set_default_camera();
+    }
 }
 
 #[derive(Default)]
@@ -112,7 +119,8 @@ pub struct Block {
 }
 
 impl Block {
-    pub fn delinearize(w: u16, block_index: u16) -> Vec3 {
+    pub fn delinearize(block_index: u16) -> Vec3 {
+        let w = SCAN_WIDTH;
         let r = block_index % (w * w);
 
         let x = r % w;
@@ -129,5 +137,40 @@ impl Default for Block {
             name: "minecraft:air".to_string(),
             coord: Vec3::ZERO,
         }
+    }
+}
+
+#[derive(Default)]
+pub struct KeyboardEventHandler {
+    pub mouse_grabbed: bool,
+}
+
+impl KeyboardEventHandler {
+    pub fn new() -> Self {
+        let mouse_grabbed = true;
+
+        set_cursor_grab(mouse_grabbed);
+        show_mouse(false);
+
+        KeyboardEventHandler { mouse_grabbed }
+    }
+
+    pub fn should_close_app() -> bool {
+        is_key_pressed(KeyCode::Escape)
+    }
+
+    pub fn should_grab() -> bool {
+        is_key_pressed(KeyCode::Tab)
+    }
+
+    pub fn should_submit_command(camera: &VoxelCamera) -> bool {
+        is_key_pressed(KeyCode::Enter) && camera.locked
+    }
+
+    pub fn switch_grab_mode(&mut self, camera: &mut VoxelCamera) {
+        self.mouse_grabbed = !self.mouse_grabbed;
+        camera.locked = !camera.locked;
+        set_cursor_grab(self.mouse_grabbed);
+        show_mouse(!self.mouse_grabbed);
     }
 }
