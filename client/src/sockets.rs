@@ -43,11 +43,11 @@ impl Sockets {
         // '1[Error message]' -> Commaand failed
         // 2[Comma separated blocks][Block index] -> Geo Scanner data
 
-        if msg.chars().next() == Some('0') {
+        if msg.starts_with('0') {
             log::info!("Command executed successfully");
-        } else if msg.chars().next() == Some('1') {
-            log::error!("Turtle does not understand the command! {}", &msg[1..]);
-        } else if msg.chars().next() == Some('2') {
+        } else if let Some(inner_msg) = msg.strip_prefix('1') {
+            log::error!("Turtle does not understand the command! {}", inner_msg);
+        } else if msg.starts_with('2') {
             let names = msg
                 .split("][")
                 .next()

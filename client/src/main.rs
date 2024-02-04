@@ -1,5 +1,6 @@
 mod event_loop;
 pub mod objects;
+pub mod renderer;
 pub mod sockets;
 
 use macroquad::prelude::Conf;
