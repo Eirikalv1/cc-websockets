@@ -104,3 +104,30 @@ impl TextInput {
         root_ui().pop_skin();
     }
 }
+
+#[derive(Clone)]
+pub struct Block {
+    pub name: String,
+    pub coord: Vec3,
+}
+
+impl Block {
+    pub fn delinearize(w: u16, block_index: u16) -> Vec3 {
+        let r = block_index % (w * w);
+
+        let x = r % w;
+        let y = r / w;
+        let z = block_index / (w * w);
+
+        vec3(x as f32, y as f32, z as f32)
+    }
+}
+
+impl Default for Block {
+    fn default() -> Self {
+        Self {
+            name: "minecraft:air".to_string(),
+            coord: Vec3::ZERO,
+        }
+    }
+}

@@ -1,5 +1,5 @@
 mod event_loop;
-pub mod gui_client;
+pub mod objects;
 
 use macroquad::prelude::Conf;
 

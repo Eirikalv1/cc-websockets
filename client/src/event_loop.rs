@@ -1,16 +1,7 @@
 use macroquad::prelude::*;
 use simple_websockets::{Event, Message};
 
-use crate::gui_client::{TextInput, VoxelCamera};
-
-fn to3d(i: f32) -> Vec3 {
-    let w = 3.;
-    let z = f32::floor(i / (w * w));
-    let r = i % (w * w);
-    let y = f32::floor(r / w);
-    let x = r % w;
-    vec3(x, y, z)
-}
+use crate::objects::{Block, TextInput, VoxelCamera};
 
 pub async fn run() {
     let event_hub = simple_websockets::launch(1234).expect("failed to listen on port 1234");
@@ -23,7 +14,9 @@ pub async fn run() {
     set_cursor_grab(grabbed);
     show_mouse(false);
 
-    let mut block_positions = vec![];
+    let radius: u16 = 8;
+    let width = 2 * radius + 1;
+    let mut blocks: Vec<Block> = vec![Default::default(); width.pow(3) as usize];
 
     loop {
         if let Some(event) = event_hub.next_event() {
@@ -44,7 +37,7 @@ pub async fn run() {
                             msg = "Command executed successfully".to_string();
                         }
 
-                        let _blocks = msg
+                        let names = msg
                             .split("][")
                             .next()
                             .unwrap()
@@ -53,17 +46,26 @@ pub async fn run() {
                             .split(',')
                             .map(|s| s.trim_matches('"').to_string())
                             .collect::<Vec<String>>();
-                        let block_positions_linearized = msg
+                        let coords_linearized = msg
                             .split("][")
                             .nth(1)
                             .unwrap()
                             .trim_start_matches('[')
                             .trim_end_matches(']')
                             .split(',')
-                            .map(|s| s.parse::<i32>().unwrap())
-                            .collect::<Vec<i32>>();
+                            .map(|s| s.parse::<u16>().unwrap())
+                            .collect::<Vec<u16>>();
 
-                        block_positions = block_positions_linearized
+                        for (block_index, name_index) in coords_linearized.iter().enumerate() {
+                            let block = &mut blocks[block_index];
+
+                            block.coord = Block::delinearize(width, block_index as u16);
+                            if *name_index > 0 {
+                                block.name = names[*name_index as usize - 1].to_owned();
+                            } else {
+                                block.name = "minecraft:air".to_string();
+                            }
+                        }
                     }
                 }
             }
@@ -96,10 +98,10 @@ pub async fn run() {
 
         draw_grid(20, 1., BLACK, GRAY);
 
-        for (i, block) in block_positions.iter().enumerate() {
-            if *block != 0 {
-                draw_cube(to3d(i as f32) - 0.5, vec3(1., 1., 1.), None, GREEN);
-                draw_cube_wires(to3d(i as f32) - 0.5, vec3(1., 1., 1.), BLACK);
+        for block in blocks.iter() {
+            if block.name != *"minecraft:air" {
+                draw_cube(block.coord - 0.5, vec3(1., 1., 1.), None, GREEN);
+                draw_cube_wires(block.coord - 0.5, vec3(1., 1., 1.), BLACK);
             }
         }
 
