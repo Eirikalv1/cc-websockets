@@ -7,6 +7,7 @@ use macroquad::prelude::Conf;
 
 pub const SCAN_RADIUS: u16 = 8; // Between 1 and 16
 pub const SCAN_WIDTH: u16 = 2 * SCAN_RADIUS + 1;
+pub const SCAN_WIDTH_SQUARED: u16 = SCAN_WIDTH.pow(2);
 pub const SCAN_WIDTH_CUBED: u16 = SCAN_WIDTH.pow(3);
 
 fn conf() -> Conf {

@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::SCAN_WIDTH;
+use crate::{SCAN_WIDTH, SCAN_WIDTH_SQUARED};
 
 #[derive(Default)]
 pub struct VoxelCamera {
@@ -116,6 +116,7 @@ impl TextInput {
 pub struct Block {
     pub name: String,
     pub coord: Vec3,
+    pub color: Color,
 }
 
 impl Block {
@@ -129,6 +130,10 @@ impl Block {
 
         vec3(x as f32, y as f32, z as f32)
     }
+
+    pub fn linearize(coord: Vec3) -> u16 {
+        (coord.x + coord.y * SCAN_WIDTH as f32 + coord.z * SCAN_WIDTH_SQUARED as f32) as u16
+    }
 }
 
 impl Default for Block {
@@ -136,6 +141,7 @@ impl Default for Block {
         Self {
             name: "minecraft:air".to_string(),
             coord: Vec3::ZERO,
+            color: GREEN,
         }
     }
 }
