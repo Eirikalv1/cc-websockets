@@ -80,8 +80,13 @@ impl Sockets {
                 if *name_index > 0 {
                     block.name = names[*name_index as usize - 1].to_owned();
                     let hash: [u8; 16] = md5::compute(block.name.as_bytes()).into();
-                    
-                    block.color = Color::new(hash[0] as f32 / 255., hash[1] as f32 / 255., hash[2] as f32 / 255., 1.0);
+
+                    block.color = Color::new(
+                        hash[0] as f32 / 255.,
+                        hash[1] as f32 / 255.,
+                        hash[2] as f32 / 255.,
+                        1.0,
+                    );
                 } else {
                     block.name = "minecraft:air".to_string();
                 }
