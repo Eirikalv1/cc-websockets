@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 log = "0.4.20"
 macroquad = "0.4.4"
+md5 = "0.7.0"
 pretty_env_logger = "0.5.0"
 simple-websockets = "0.1.6"
 
