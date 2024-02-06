@@ -34,6 +34,12 @@ impl Renderer {
         let mut indices: Vec<u16> = vec![];
         let mut indicies_index: u32 = 0;
 
+        let texture = Some(Texture2D::from_file_with_format(
+            include_bytes!("smooth_stone.png"),
+            None,
+        ));
+        texture.as_ref().unwrap().set_filter(FilterMode::Nearest);
+
         for block in self.blocks.iter() {
             if block.name == "minecraft:air" {
                 continue;
@@ -62,14 +68,12 @@ impl Renderer {
             vertices.append(&mut block_vertices);
             indices.append(&mut block_indices);
 
-            draw_cube_wires(block.coord + 0.5, Vec3::ONE, BLACK);
-
             // Macroquad's draw call limitation of 10000 vertices or 5000 indices
             if vertices.len() > 9800 || indices.len() > 4800 {
                 draw_mesh(&Mesh {
                     vertices: vertices.clone(),
                     indices: indices.clone(),
-                    texture: None,
+                    texture: texture.clone(),
                 });
 
                 vertices = vec![];
@@ -81,15 +85,21 @@ impl Renderer {
         draw_mesh(&Mesh {
             vertices: vertices.clone(),
             indices: indices.clone(),
-            texture: None,
+            texture: texture.clone(),
         });
     }
 
     fn get_quad_data(quad: usize, block: &Block) -> Vec<Vertex> {
-        let min_x = block.coord.x;
-        let min_y = block.coord.y;
-        let min_z = block.coord.z;
-        let color = block.color;
+        let Block {
+            name: _,
+            coord:
+                Vec3 {
+                    x: min_x,
+                    y: min_y,
+                    z: min_z,
+                },
+            color,
+        } = block.to_owned();
 
         let max_x = min_x + 1.;
         let max_y = min_y + 1.;
