@@ -35,6 +35,6 @@ pub async fn run() {
             text_input.text = String::new();
         }
 
-        renderer.draw().await;
+        renderer.draw(&camera).await;
     }
 }

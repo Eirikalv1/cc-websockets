@@ -10,11 +10,14 @@ pub const SCAN_WIDTH: u16 = 2 * SCAN_RADIUS + 1;
 pub const SCAN_WIDTH_SQUARED: u16 = SCAN_WIDTH.pow(2);
 pub const SCAN_WIDTH_CUBED: u16 = SCAN_WIDTH.pow(3);
 
+pub const SCREEN_WIDTH: i32 = 1260;
+pub const SCREEN_HEIGHT: i32 = 768;
+
 fn conf() -> Conf {
     Conf {
         window_title: String::from("Macroquad"),
-        window_width: 1260,
-        window_height: 768,
+        window_width: SCREEN_WIDTH,
+        window_height: SCREEN_HEIGHT,
         fullscreen: false,
         ..Default::default()
     }

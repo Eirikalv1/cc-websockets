@@ -9,14 +9,16 @@ pub struct VoxelCamera {
     pub locked: bool,
     look_speed: f32,
     pitch: f32,
-    position: Vec3,
+    pub position: Vec3,
     yaw: f32,
+    pub direction: Vec3,
 }
 
 impl VoxelCamera {
     pub fn new() -> Self {
         let yaw: f32 = 1.18;
         let pitch: f32 = 0.0;
+        let direction = Vec3::ZERO;
 
         let position = vec3(0.0, 1.0, 0.0);
         let last_mouse_position: Vec2 = mouse_position().into();
@@ -29,6 +31,7 @@ impl VoxelCamera {
             pitch,
             position,
             yaw,
+            direction,
         }
     }
 
@@ -47,12 +50,13 @@ impl VoxelCamera {
         self.pitch = if self.pitch > 1.5 { 1.5 } else { self.pitch };
         self.pitch = if self.pitch < -1.5 { -1.5 } else { self.pitch };
 
-        let front = vec3(
+        self.direction = vec3(
             self.yaw.cos() * self.pitch.cos(),
             self.pitch.sin(),
             self.yaw.sin() * self.pitch.cos(),
         )
         .normalize();
+        let front = self.direction;
 
         let right = front.cross(Vec3::Y).normalize();
 
@@ -81,11 +85,6 @@ impl VoxelCamera {
             target: self.position + front,
             ..Default::default()
         });
-    }
-
-    // Call this after all draw calls
-    pub fn set_default_camera() {
-        set_default_camera();
     }
 }
 
@@ -152,6 +151,10 @@ pub struct KeyboardEventHandler {
 }
 
 impl KeyboardEventHandler {
+    pub fn left_clicked() -> bool {
+        is_mouse_button_down(MouseButton::Left)
+    }
+
     pub fn new() -> Self {
         let mouse_grabbed = true;
 
