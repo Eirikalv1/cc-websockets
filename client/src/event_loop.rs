@@ -31,6 +31,6 @@ pub async fn run() {
             ui_handler.text = String::new();
         }
 
-        renderer.draw(&camera).await;
+        renderer.draw(&camera, &keyboard_events).await;
     }
 }
