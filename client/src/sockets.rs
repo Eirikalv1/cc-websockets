@@ -61,7 +61,7 @@ impl Sockets {
                 .split("][")
                 .next()
                 .unwrap()
-                .trim_start_matches('[')
+                .trim_start_matches("2[")
                 .trim_end_matches(']')
                 .split(',')
                 .map(|s| s.trim_matches('"').to_string())
