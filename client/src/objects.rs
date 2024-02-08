@@ -148,6 +148,7 @@ impl Default for Block {
 #[derive(Default)]
 pub struct KeyboardEventHandler {
     pub mouse_grabbed: bool,
+    pub scroll_index: f32,
 }
 
 impl KeyboardEventHandler {
@@ -157,11 +158,22 @@ impl KeyboardEventHandler {
 
     pub fn new() -> Self {
         let mouse_grabbed = true;
+        let scroll_index = SCAN_WIDTH as f32;
 
         set_cursor_grab(mouse_grabbed);
         show_mouse(false);
 
-        KeyboardEventHandler { mouse_grabbed }
+        KeyboardEventHandler {
+            mouse_grabbed,
+            scroll_index,
+        }
+    }
+
+    pub fn scroll_mosue(&mut self) {
+        let mouse_wheel_index = mouse_wheel().1.clamp(-1., 1.);
+
+        self.scroll_index += mouse_wheel_index;
+        self.scroll_index %= SCAN_WIDTH as f32;
     }
 
     pub fn should_close_app() -> bool {

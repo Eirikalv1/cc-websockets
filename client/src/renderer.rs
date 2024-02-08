@@ -10,13 +10,18 @@ const INDICES: [u16; 6] = [0, 1, 2, 0, 2, 3];
 #[derive(Default)]
 pub struct Renderer {
     pub blocks: Vec<Block>,
+    pub objects_to_render: f32,
 }
 
 impl Renderer {
     pub fn new() -> Self {
         let blocks: Vec<Block> = vec![Default::default(); SCAN_WIDTH_CUBED as usize];
+        let objects_to_render = 0.;
 
-        Renderer { blocks }
+        Renderer {
+            blocks,
+            objects_to_render,
+        }
     }
 
     pub async fn draw(&self, camera: &VoxelCamera) {
@@ -43,7 +48,7 @@ impl Renderer {
         );
         if KeyboardEventHandler::left_clicked() {
             let block_name = self.ray_march(camera);
-            if block_name.len() > 0 {
+            if !block_name.is_empty() {
                 draw_rectangle(8., 8., 10. + block_name.len() as f32 * 16., 39., DARKGRAY);
             }
             draw_text(block_name, 20.0, 35.0, 35., WHITE);
@@ -65,6 +70,17 @@ impl Renderer {
             if block.name == "minecraft:air" {
                 continue;
             }
+
+            // Slicing
+            if ((block.coord.y >= self.objects_to_render
+                && self.objects_to_render.is_sign_positive())
+                || (block.coord.y <= self.objects_to_render.abs()
+                    && self.objects_to_render.is_sign_negative()))
+                && self.objects_to_render != 0.0
+            {
+                continue;
+            }
+
             let mut block_vertices: Vec<Vertex> = vec![];
             let mut block_indices: Vec<u16> = vec![];
 

@@ -24,9 +24,9 @@ pub async fn run() {
         if KeyboardEventHandler::should_grab() {
             keyboard_events.switch_grab_mode(&mut camera);
         }
-        if KeyboardEventHandler::should_close_app() {
-            break;
-        }
+
+        keyboard_events.scroll_mosue();
+        renderer.objects_to_render = keyboard_events.scroll_index;
 
         if KeyboardEventHandler::should_submit_command(&camera) {
             if let Some(responder) = &sockets.client {
