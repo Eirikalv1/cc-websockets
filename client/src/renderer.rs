@@ -383,6 +383,12 @@ impl Renderer {
                 if coord.y == SCAN_WIDTH as f32 - 1. {
                     return true;
                 }
+                // Slicing
+                if coord.y + 1. == self.objects_to_render
+                    && self.objects_to_render.is_sign_positive()
+                {
+                    return true;
+                }
             }
             3 => {
                 if let Some(adjacent_block) =
@@ -394,6 +400,12 @@ impl Renderer {
                     }
                 }
                 if coord.y == 0. {
+                    return true;
+                }
+                // Slicing
+                if coord.y - 1. == self.objects_to_render.abs()
+                    && self.objects_to_render.is_sign_negative()
+                {
                     return true;
                 }
             }
