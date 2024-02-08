@@ -164,6 +164,16 @@ impl Renderer {
                 continue;
             }
 
+            // Slicing
+            if ((block.coord.y >= self.objects_to_render
+                && self.objects_to_render.is_sign_positive())
+                || (block.coord.y <= self.objects_to_render.abs()
+                    && self.objects_to_render.is_sign_negative()))
+                && self.objects_to_render != 0.0
+            {
+                continue;
+            }
+
             let center = block.coord + 0.5;
 
             let delta = vec3(
