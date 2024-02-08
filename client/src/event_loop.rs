@@ -1,7 +1,5 @@
-use simple_websockets::Message;
-
 use crate::{
-    objects::{KeyboardEventHandler, TextInput, VoxelCamera},
+    objects::{KeyboardEventHandler, VoxelCamera, VoxelUi},
     renderer::Renderer,
     sockets::Sockets,
 };
@@ -9,7 +7,7 @@ use crate::{
 pub async fn run() {
     let mut sockets = Sockets::new();
     let mut camera = VoxelCamera::new();
-    let mut text_input = TextInput::new();
+    let mut ui_handler = VoxelUi::new();
     let mut keyboard_events = KeyboardEventHandler::new();
     let mut renderer = Renderer::new();
 
@@ -18,7 +16,7 @@ pub async fn run() {
 
         camera.process();
         if camera.locked {
-            text_input.process();
+            ui_handler.process(&sockets);
         }
 
         if KeyboardEventHandler::should_grab() {
@@ -29,12 +27,10 @@ pub async fn run() {
         renderer.objects_to_render = keyboard_events.scroll_index;
 
         if KeyboardEventHandler::should_submit_command(&camera) {
-            if let Some(responder) = &sockets.client {
-                responder.send(Message::Text(text_input.text));
-            }
-            text_input.text = String::new();
+            sockets.send_message(ui_handler.text);
+            ui_handler.text = String::new();
         }
 
-        renderer.draw(&camera).await;
+        renderer.draw(&camera, &keyboard_events).await;
     }
 }

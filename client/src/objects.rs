@@ -1,6 +1,6 @@
-use macroquad::prelude::*;
+use macroquad::{prelude::*, ui::widgets::Button};
 
-use crate::{SCAN_WIDTH, SCAN_WIDTH_SQUARED};
+use crate::{sockets::Sockets, SCAN_WIDTH, SCAN_WIDTH_SQUARED};
 
 #[derive(Default)]
 pub struct VoxelCamera {
@@ -89,23 +89,69 @@ impl VoxelCamera {
 }
 
 #[derive(Default)]
-pub struct TextInput {
+pub struct VoxelUi {
     pub text: String,
 }
 
-impl TextInput {
+impl VoxelUi {
     pub fn new() -> Self {
-        TextInput {
+        Self {
             text: String::new(),
         }
     }
 
-    pub fn process(&mut self) {
+    pub fn process(&mut self, sockets: &Sockets) {
         use macroquad::hash;
         use macroquad::ui::root_ui;
 
-        root_ui().window(hash!(), vec2(700., 0.), vec2(300., 50.), |ui| {
-            ui.input_text(macroquad::hash!(), "Text", &mut self.text);
+        root_ui().window(hash!(), vec2(10., 10.), vec2(400., 25.), |ui| {
+            ui.input_text(macroquad::hash!(), "", &mut self.text);
+        });
+        root_ui().pop_skin();
+
+        root_ui().window(hash!(), vec2(10., 50.), vec2(174., 114.), |ui| {
+            if Button::new("Forward")
+                .position(vec2(4.0, 4.0))
+                .size(vec2(80., 32.))
+                .ui(ui)
+            {
+                sockets.send_message("turtle.forward()".to_owned());
+            }
+            if Button::new("Backward")
+                .position(vec2(88.0, 4.0))
+                .size(vec2(80., 32.))
+                .ui(ui)
+            {
+                sockets.send_message("turtle.back()".to_owned());
+            }
+            if Button::new("Turn Left")
+                .position(vec2(4.0, 40.0))
+                .size(vec2(80., 32.))
+                .ui(ui)
+            {
+                sockets.send_message("turtle.turnLeft()".to_owned());
+            }
+            if Button::new("Turn Right")
+                .position(vec2(88.0, 40.0))
+                .size(vec2(80., 32.))
+                .ui(ui)
+            {
+                sockets.send_message("turtle.turnRight()".to_owned());
+            }
+            if Button::new("Up")
+                .position(vec2(4.0, 76.0))
+                .size(vec2(80., 32.))
+                .ui(ui)
+            {
+                sockets.send_message("turtle.up()".to_owned());
+            }
+            if Button::new("Down")
+                .position(vec2(88.0, 76.0))
+                .size(vec2(80., 32.))
+                .ui(ui)
+            {
+                sockets.send_message("turtle.down()".to_owned());
+            }
         });
         root_ui().pop_skin();
     }

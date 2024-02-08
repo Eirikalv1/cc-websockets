@@ -24,18 +24,18 @@ impl Renderer {
         }
     }
 
-    pub async fn draw(&self, camera: &VoxelCamera) {
+    pub async fn draw(&self, camera: &VoxelCamera, keyboard_events: &KeyboardEventHandler) {
         clear_background(LIGHTGRAY);
 
         draw_grid(20, 1., BLACK, GRAY);
         self.mesh();
 
-        self.draw_ui(camera);
+        self.draw_ui(camera, keyboard_events);
 
         next_frame().await
     }
 
-    pub fn draw_ui(&self, camera: &VoxelCamera) {
+    pub fn draw_ui(&self, camera: &VoxelCamera, keyboard_events: &KeyboardEventHandler) {
         // set_default_camera should be called after drawing in 3d
         set_default_camera();
 
@@ -46,7 +46,7 @@ impl Renderer {
             30.,
             DARKGRAY,
         );
-        if KeyboardEventHandler::left_clicked() {
+        if KeyboardEventHandler::left_clicked() && keyboard_events.mouse_grabbed {
             let block_name = self.ray_march(camera);
             if !block_name.is_empty() {
                 draw_rectangle(8., 8., 10. + block_name.len() as f32 * 16., 39., DARKGRAY);
@@ -161,6 +161,16 @@ impl Renderer {
 
         for block in self.blocks.iter() {
             if block.name == "minecraft:air" {
+                continue;
+            }
+
+            // Slicing
+            if ((block.coord.y >= self.objects_to_render
+                && self.objects_to_render.is_sign_positive())
+                || (block.coord.y <= self.objects_to_render.abs()
+                    && self.objects_to_render.is_sign_negative()))
+                && self.objects_to_render != 0.0
+            {
                 continue;
             }
 
