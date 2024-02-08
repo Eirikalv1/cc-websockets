@@ -38,6 +38,14 @@ impl Sockets {
         };
     }
 
+    pub fn send_message(&self, text: String) {
+        if let Some(responder) = &self.client {
+            responder.send(Message::Text(text));
+        } else {
+            log::error!("Cannot send message, no turtle connected!");
+        }
+    }
+
     fn message_event(msg: &str, blocks: &mut [Block]) {
         // Message protocol: "[Message type integer][Data]" e.g. '0minecraft:stone'
         // '0' -> Command executed successfully
